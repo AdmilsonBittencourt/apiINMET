@@ -2,6 +2,13 @@ import express from 'express';
 import 'dotenv/config';
 import  router  from './routes/index.js';
 
+// =================== INÍCIO DO TESTE DE DEBUG ===================
+console.log('--- INICIANDO TESTE DE VARIÁVEIS DE AMBIENTE ---');
+console.log('Valor de INMET_TOKEN:', process.env.INMET_TOKEN);
+console.log('Valor de PORT:', process.env.PORT);
+console.log('--- FIM DO TESTE ---');
+// =============================================================
+
 const app = express();
 
 // Middleware para interpretar JSON no corpo das requisições
