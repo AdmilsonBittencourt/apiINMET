@@ -6,8 +6,8 @@ import * as apiService from '../services/externalApiService.js';
  */
 export const handleHourlyDataByStation = async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate, stationCode } = req.params;
-    const rawData = await apiService.getHourlyDataByStation(startDate!, endDate!, stationCode!);
+    const { startDate, endDate, stationCode } = req.query;
+    const rawData = await apiService.getHourlyDataByStation(String(startDate), String(endDate), String(stationCode));
 
     // --- PONTO CHAVE: LOCAL DOS CÁLCULOS ---
     // Exemplo de cálculo: Calcular a temperatura média no período.
@@ -40,8 +40,8 @@ export const handleHourlyDataByStation = async (req: Request, res: Response) => 
  */
 export const handleHourlyDataForAllStations = async (req: Request, res: Response) => {
   try {
-    const { date, hour } = req.params;
-    const rawData = await apiService.getHourlyDataForAllStations(date!, hour!);
+    const { date, hour } = req.query;
+    const rawData = await apiService.getHourlyDataForAllStations(String(date), String(hour));
 
     // --- PONTO CHAVE: LOCAL DOS CÁLCULOS ---
     // Exemplo: Encontrar a estação com a maior e a menor temperatura na hora consultada.
@@ -89,8 +89,8 @@ export const handleHourlyDataForAllStations = async (req: Request, res: Response
  */
 export const handleDailyDataByStation = async (req: Request, res: Response) => {
     try {
-        const { startDate, endDate, stationCode } = req.params;
-        const rawData = await apiService.getDailyDataByStation(startDate!, endDate!, stationCode!);
+        const { startDate, endDate, stationCode } = req.query;
+        const rawData = await apiService.getDailyDataByStation(String(startDate), String(endDate), String(stationCode));
         
         // --- PONTO CHAVE: LOCAL DOS CÁLCULOS ---
         // Exemplo: Calcular o total de chuva no período.
@@ -114,4 +114,32 @@ export const handleDailyDataByStation = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Erro interno no servidor.', error: String(error) });
   }
     }
+};
+
+/**
+ * Controlador para dados horários filtrados de um dia para uma estação.
+ */
+export const handleFilteredHourlyDataForDay = async (req: Request, res: Response) => {
+  try {
+    const { date, stationCode } = req.query;
+    console.log({date: date, stationCode: stationCode})
+    const processedData = await apiService.getFilteredHourlyDataForDay(String(date), String(stationCode));
+
+    if (processedData.length === 0) {
+      return res.status(404).json({ 
+        message: 'Nenhum dado encontrado para esta data e estação.',
+        date,
+        stationCode
+      });
+    }
+
+    res.status(200).json(processedData);
+  } catch (error) {
+    if (error instanceof Error) {
+    res.status(500).json({ message: 'Erro interno no servidor.', error: error.message });
+  } else {
+    // Caso seja outro tipo de erro
+    res.status(500).json({ message: 'Erro interno no servidor.', error: String(error) });
+  }
+  }
 };
